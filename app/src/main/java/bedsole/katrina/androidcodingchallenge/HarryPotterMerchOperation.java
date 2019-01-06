@@ -2,7 +2,6 @@ package bedsole.katrina.androidcodingchallenge;
 
 import android.content.Context;
 import android.os.Handler;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -56,8 +55,6 @@ public class HarryPotterMerchOperation {
                 mainHandler.post(new Runnable() {
                     @Override
                     public void run() {
-
-                        Log.d("JEDI", e.getLocalizedMessage());
                         call.cancel();
                     }
                 });

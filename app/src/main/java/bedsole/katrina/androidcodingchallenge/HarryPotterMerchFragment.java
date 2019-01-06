@@ -3,18 +3,26 @@ package bedsole.katrina.androidcodingchallenge;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
 import bedsole.katrina.androidcodingchallenge.databinding.FragmentHarryPotterBinding;
+import bedsole.katrina.androidcodingchallenge.databinding.ItemHpMerchBinding;
 
 public class HarryPotterMerchFragment extends Fragment implements HarryPotterMerchOperation.HPMerchDataListener {
 
     private FragmentHarryPotterBinding layout;
+
+    private HarryPotterMerchAdapter adapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -27,7 +35,10 @@ public class HarryPotterMerchFragment extends Fragment implements HarryPotterMer
         hpOperation.setHpMerchDataListener(this);
         hpOperation.getHPData();
 
-        // TODO: setup adapter for recycler view
+        // setup adapter for harry potter list data
+        layout.recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        adapter = new HarryPotterMerchAdapter();
+        layout.recyclerView.setAdapter(adapter);
 
         return layout.getRoot();
     }
@@ -49,14 +60,87 @@ public class HarryPotterMerchFragment extends Fragment implements HarryPotterMer
 
     @Override
     public void onHPDataLoaded(List<HPMerch> hpMerchList) {
-        // TODO: set data for adapter here
-
         if (hpMerchList == null) {
             return;
         }
 
-        for (HPMerch hpMerchObj : hpMerchList) {
-            Log.d("TAG", hpMerchObj.toString());
+        adapter.setData(hpMerchList);
+    }
+
+
+    /**
+     * LIST ADAPTER
+     */
+    class HarryPotterMerchAdapter extends RecyclerView.Adapter<HarryPotterMerchAdapter.HarryPotterMerchViewHolder> {
+
+        private List<HPMerch> hpMerchList;
+
+        public HarryPotterMerchAdapter() {
+        }
+
+        public void setData(List<HPMerch> hpMerchData) {
+            if (hpMerchData != null) {
+                hpMerchList = hpMerchData;
+                notifyDataSetChanged();
+            }
+        }
+
+        @Override
+        public HarryPotterMerchViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
+            ItemHpMerchBinding binding = DataBindingUtil.inflate(layoutInflater, R.layout.item_hp_merch, parent, false);
+            return new HarryPotterMerchViewHolder(binding);
+        }
+
+        @Override
+        public void onBindViewHolder(HarryPotterMerchViewHolder holder, int position) {
+            HPMerch hpMerchObj = hpMerchList.get(position);
+
+            if (hpMerchObj == null) {
+                return;
+            }
+
+            holder.titleTextView.setText(hpMerchObj.title);
+
+            if (hpMerchObj.author != null) {
+                holder.authorTextView.setText(hpMerchObj.author);
+            } else {
+                holder.authorTextView.setVisibility(View.GONE);
+            }
+
+            if (hpMerchObj.imageURL != null && !hpMerchObj.imageURL.isEmpty()) {
+                Picasso.get()
+                        .load(hpMerchObj.imageURL)
+                        .placeholder(R.drawable.hp_default)
+                        .into(holder.thumbnailImageView);
+            }
+
+        }
+
+        @Override
+        public int getItemCount() {
+            if (hpMerchList == null) {
+                return 0;
+            }
+            return hpMerchList.size();
+        }
+
+
+        /**
+         * ITEM VIEW HOLDER
+         */
+        class HarryPotterMerchViewHolder extends RecyclerView.ViewHolder {
+
+            TextView titleTextView;
+            TextView authorTextView;
+            ImageView thumbnailImageView;
+
+            public HarryPotterMerchViewHolder(ItemHpMerchBinding binding) {
+                super(binding.getRoot());
+                titleTextView = binding.titleTextView;
+                authorTextView = binding.authorTextView;
+                thumbnailImageView = binding.thumbnailImageView;
+            }
         }
     }
 
