@@ -9,5 +9,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        HarryPotterMerchFragment fragment = new HarryPotterMerchFragment();
+
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.fragment_container, fragment, fragment.getTag())
+                .commit();
     }
 }
